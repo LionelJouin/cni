@@ -170,6 +170,7 @@ type Route struct {
 	MTU      int
 	AdvMSS   int
 	Priority int
+	Metadata map[string]string
 }
 
 func (r *Route) String() string {
@@ -187,6 +188,7 @@ func (r *Route) Copy() *Route {
 		MTU:      r.MTU,
 		AdvMSS:   r.AdvMSS,
 		Priority: r.Priority,
+		Metadata: r.Metadata,
 	}
 }
 
@@ -237,11 +239,12 @@ func (e *Error) Print() error {
 
 // JSON (un)marshallable types
 type route struct {
-	Dst      IPNet  `json:"dst"`
-	GW       net.IP `json:"gw,omitempty"`
-	MTU      int    `json:"mtu,omitempty"`
-	AdvMSS   int    `json:"advmss,omitempty"`
-	Priority int    `json:"priority,omitempty"`
+	Dst      IPNet             `json:"dst"`
+	GW       net.IP            `json:"gw,omitempty"`
+	MTU      int               `json:"mtu,omitempty"`
+	AdvMSS   int               `json:"advmss,omitempty"`
+	Priority int               `json:"priority,omitempty"`
+	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
 func (r *Route) UnmarshalJSON(data []byte) error {
@@ -255,6 +258,7 @@ func (r *Route) UnmarshalJSON(data []byte) error {
 	r.MTU = rt.MTU
 	r.AdvMSS = rt.AdvMSS
 	r.Priority = rt.Priority
+	r.Metadata = rt.Metadata
 
 	return nil
 }
@@ -266,6 +270,7 @@ func (r Route) MarshalJSON() ([]byte, error) {
 		MTU:      r.MTU,
 		AdvMSS:   r.AdvMSS,
 		Priority: r.Priority,
+		Metadata: r.Metadata,
 	}
 
 	return json.Marshal(rt)
