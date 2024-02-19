@@ -170,11 +170,16 @@ type Route struct {
 	MTU      int
 	AdvMSS   int
 	Priority int
-	Scope    int
+	Scope    *int
 }
 
 func (r *Route) String() string {
-	return fmt.Sprintf("%+v", *r)
+	scope := "<nil>"
+	if r.Scope != nil {
+		scope = fmt.Sprintf("%d", *r.Scope)
+	}
+
+	return fmt.Sprintf("{Dst:%+v GW:%v MTU:%d AdvMSS:%d Priority:%d Scope:%s}", r.Dst, r.GW, r.MTU, r.AdvMSS, r.Priority, scope)
 }
 
 func (r *Route) Copy() *Route {
@@ -182,7 +187,7 @@ func (r *Route) Copy() *Route {
 		return nil
 	}
 
-	return &Route{
+	route := &Route{
 		Dst:      r.Dst,
 		GW:       r.GW,
 		MTU:      r.MTU,
@@ -190,6 +195,13 @@ func (r *Route) Copy() *Route {
 		Priority: r.Priority,
 		Scope:    r.Scope,
 	}
+
+	if r.Scope != nil {
+		scope := *r.Scope
+		route.Scope = &scope
+	}
+
+	return route
 }
 
 // Well known error codes
@@ -244,7 +256,7 @@ type route struct {
 	MTU      int    `json:"mtu,omitempty"`
 	AdvMSS   int    `json:"advmss,omitempty"`
 	Priority int    `json:"priority,omitempty"`
-	Scope    int    `json:"scope,omitempty"`
+	Scope    *int   `json:"scope,omitempty"`
 }
 
 func (r *Route) UnmarshalJSON(data []byte) error {
